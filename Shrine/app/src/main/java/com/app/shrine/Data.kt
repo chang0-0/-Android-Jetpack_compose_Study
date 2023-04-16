@@ -16,6 +16,14 @@ enum class Vendor {
     Squiggle,
 }
 
+enum class Category() {
+    All,
+    Acceessories,
+    Clothing,
+    Home
+} // End of Category
+
+
 val SampleItemsData = listOf(
     ItemData(
         id = 0,
@@ -67,3 +75,4 @@ val SampleItemsData = listOf(
         photoResId = R.drawable.photo_6
     )
 )
+

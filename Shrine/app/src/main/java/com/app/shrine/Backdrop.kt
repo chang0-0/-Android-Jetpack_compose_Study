@@ -1,8 +1,11 @@
 package com.app.shrine
 
+import android.graphics.Paint.Align
 import androidx.compose.animation.*
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -14,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -80,6 +84,7 @@ private fun MenuSearchField() {
     }
 } // End of MenuSearchField
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun ShrineTopAppBar(
     backdropRevealed: Boolean,
@@ -137,18 +142,97 @@ private fun ShrineTopAppBar(
                     )
                 }
 
+                val logoTransition = updateTransition(
+                    targetState = backdropRevealed,
+                    label = "logoTransition"
+                )
+
+                val logoOffset by logoTransition.animateDp(
+                    transitionSpec = {
+                        if (targetState) {
+                            tween(durationMillis = 120, easing = LinearEasing)
+                        } else {
+                            tween(durationMillis = 270, easing = LinearEasing)
+                        }
+                    },
+                    label = "logoOffset"
+                ) { revealed ->
+                    if (!revealed) 20.dp else 0.dp
+                }
+
                 Icon(
                     painterResource(id = R.drawable.ic_shrine_logo),
                     contentDescription = "Shrine logo",
-                    modifier = Modifier.offset(x = if (!backdropRevealed) 20.dp else 0.dp)
+                    modifier = Modifier.offset(x = logoOffset)
                 )
             }
 
-            // TopAppBar가 펼쳐져있으면 TopAppBar Text가 보이고, 아닐 경우 검색창이 보임
-            if (!backdropRevealed) {
-                TopAppBarText(text = "Shrine")
-            } else {
-                MenuSearchField()
+            AnimatedContent(
+                targetState = backdropRevealed,
+                transitionSpec = {
+                    if (targetState) {
+                        // Conceal to reveal
+                        fadeIn(
+                            animationSpec = tween(
+                                durationMillis = 240,
+                                delayMillis = 120,
+                                easing = LinearEasing
+                            )
+                        ) +
+                                slideInHorizontally(
+                                    initialOffsetX = { with(density) { 30.dp.roundToPx() } },
+                                    animationSpec = tween(
+                                        durationMillis = 270,
+                                        easing = LinearEasing
+                                    )
+                                ) with
+                                fadeOut(
+                                    animationSpec = tween(
+                                        durationMillis = 120,
+                                        easing = LinearEasing
+                                    )
+                                ) +
+                                slideOutHorizontally(
+                                    targetOffsetX = { with(density) { (-30).dp.roundToPx() } },
+                                    animationSpec = tween(
+                                        durationMillis = 120,
+                                        easing = LinearEasing
+                                    )
+                                )
+                    } else {
+                        // Reveal to conceal
+                        fadeIn(
+                            animationSpec = tween(
+                                durationMillis = 180,
+                                delayMillis = 90,
+                                easing = LinearEasing
+                            )
+                        ) +
+                                slideInHorizontally(
+                                    initialOffsetX = { with(density) { (-30).dp.roundToPx() } },
+                                    animationSpec = tween(
+                                        durationMillis = 270,
+                                        easing = LinearEasing
+                                    )
+                                ) with
+                                fadeOut(
+                                    animationSpec = tween(
+                                        durationMillis = 90,
+                                        easing = LinearEasing
+                                    )
+                                ) +
+                                slideOutHorizontally(
+                                    targetOffsetX = { with(density) { 30.dp.roundToPx() } },
+                                    animationSpec = tween(
+                                        durationMillis = 90,
+                                        easing = LinearEasing
+                                    )
+                                )
+                    }.using(SizeTransform(clip = false))
+                },
+                contentAlignment = Alignment.CenterStart
+            ) {
+
             }
         },
         actions = {
@@ -166,56 +250,55 @@ private fun ShrineTopAppBar(
 @ExperimentalMaterialApi
 @Composable
 fun Backdrop() {
+    val scaffoldState = rememberBackdropScaffoldState(BackdropValue.Concealed)
+    var backdropRevealed by rememberSaveable { mutableStateOf(scaffoldState.isRevealed) }
     val scope = rememberCoroutineScope()
-    var backdropState = rememberBackdropScaffoldState(BackdropValue.Concealed)
-    var menuSelection by remember {
-        mutableStateOf(0)
+    var activeCategory by rememberSaveable {
+        mutableStateOf(Category.All)
     }
 
-    BackdropScaffold(scaffoldState = backdropState, appBar = {
-        TopAppBar(title = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(painterResource(id = R.drawable.ic_menu_cut_24px),
-                    contentDescription = "Menu icon",
-                    modifier = Modifier.clickable {
-                        scope.launch {
-                            if (backdropState.isConcealed) {
-                                backdropState.reveal()
-                            } else {
-                                backdropState.conceal()
-                            }
+    BackdropScaffold(
+        scaffoldState = scaffoldState,
+        gesturesEnabled = false,
+        appBar = {
+            ShrineTopAppBar(
+                backdropRevealed = scaffoldState.isRevealed,
+                onBackdropReveal = {
+                    backdropRevealed = it
+                    scope.launch {
+                        if (scaffoldState.isConcealed) {
+                            scaffoldState.reveal()
+                        } else {
+                            scaffoldState.conceal()
                         }
-                    })
-                Icon(
-                    painterResource(id = R.drawable.ic_shrine_logo),
-                    contentDescription = "Shrine logo",
-                )
-                Spacer(Modifier.width(6.dp))
-                Text(
-                    "Shrine".uppercase(), style = MaterialTheme.typography.subtitle1
-                )
-            }
-        }, actions = {
-            Icon(
-                imageVector = Icons.Default.Search, contentDescription = "Search action"
-            )
-        }, elevation = 0.dp
-        )
-    }, frontLayerContent = {
-        Column(Modifier.padding(16.dp)) {
-            Text("This is the content for the ${menuData[menuSelection]}")
-        }
-    }, frontLayerShape = MaterialTheme.shapes.large,
-        backLayerContent = {
-            BackdropMenuItems(
-                activeMenuItem = menuSelection,
-                onMenuItemSelect = {
-                    menuSelection = it
+                    }
                 }
             )
-        }
+        },
+        frontLayerContent = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp)
+            ) {
+                Text("This is the content for category : $activeCategory")
+            }
+        },
+        backLayerContent = {
+            NavigationMenu(
+                modifier = Modifier.padding(top = 12.dp, bottom = 32.dp),
+                activeCategory = activeCategory,
+                onMenuSelect = {
+                    backdropRevealed = false
+                    activeCategory = it
+                    scope.launch {
+                        scaffoldState.conceal()
+                    }
+                }
+            )
+        },
+        frontLayerShape = MaterialTheme.shapes.large,
+        frontLayerElevation = 16.dp
     )
 } // End of Backdrop
 
@@ -291,6 +374,23 @@ fun ShrineTopAppBarPreview() {
 } // End of ShrineTopAppBarPreview
 
 @Composable
+private fun NavigationMenu(
+    modifier: Modifier = Modifier,
+    activeCategory: Category = Category.All,
+    onMenuSelect: (Category) -> Unit = {}
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(modifier),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        val categories = Category.values()
+
+    }
+} // End of NavigationMenu
+
+@Composable
 private fun MenuText(
     text: String = "Item",
     activeDecoration: @Composable () -> Unit = {}
@@ -308,6 +408,7 @@ private fun MenuText(
 } // End of MenuText
 
 
+@OptIn(ExperimentalAnimationApi::class)
 @ExperimentalMaterialApi
 @Preview
 @Composable
