@@ -27,6 +27,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DefaultPreview() {
     ShrineTheme {
-        Cart()
+        ExpandedCart()
     }
 } // End of DefaultPreview
