@@ -1,6 +1,5 @@
 package com.app.shrine
 
-import android.graphics.Paint.Align
 import androidx.compose.animation.*
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDp
@@ -21,6 +20,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,8 +56,7 @@ private fun MenuSearchField() {
             .padding(end = 12.dp),
         contentAlignment = Alignment.CenterStart
     ) {
-        BasicTextField(
-            value = searchText,
+        BasicTextField(value = searchText,
             onValueChange = { searchText = it },
             singleLine = true,
             decorationBox = { innerTextField ->
@@ -69,12 +68,10 @@ private fun MenuSearchField() {
                 ) {
                     innerTextField()
                 }
-            }
-        )
+            })
         if (searchText.isEmpty()) {
             TopAppBarText(
-                modifier = Modifier.alpha(ContentAlpha.disabled),
-                text = "Search Shrine"
+                modifier = Modifier.alpha(ContentAlpha.disabled), text = "Search Shrine"
             )
         }
         Divider(
@@ -84,7 +81,7 @@ private fun MenuSearchField() {
     }
 } // End of MenuSearchField
 
-@OptIn(ExperimentalAnimationApi::class)
+@ExperimentalAnimationApi
 @Composable
 private fun ShrineTopAppBar(
     backdropRevealed: Boolean,
@@ -121,12 +118,11 @@ private fun ShrineTopAppBar(
                             with(density) {
                                 (-20).dp.roundToPx()
                             }
-                        }, animationSpec = tween(durationMillis = 270, easing = LinearEasing)
-                    ),
-                    exit = fadeOut(
+                        },
+                        animationSpec = tween(durationMillis = 270, easing = LinearEasing)
+                    ), exit = fadeOut(
                         animationSpec = tween(
-                            durationMillis = 120,
-                            easing = LinearEasing
+                            durationMillis = 120, easing = LinearEasing
                         )
                     ) + slideOutHorizontally(
                         targetOffsetX = {
@@ -134,7 +130,8 @@ private fun ShrineTopAppBar(
                                 (-20).dp.roundToPx()
                             }
                         }, animationSpec = tween(durationMillis = 120, easing = LinearEasing)
-                    )
+                    ),
+                    label = "Menu navigation icon"
                 ) {
                     Icon(
                         painterResource(id = R.drawable.ic_menu_cut_24px),
@@ -154,8 +151,7 @@ private fun ShrineTopAppBar(
                         } else {
                             tween(durationMillis = 270, easing = LinearEasing)
                         }
-                    },
-                    label = "logoOffset"
+                    }, label = "logoOffset"
                 ) { revealed ->
                     if (!revealed) 20.dp else 0.dp
                 }
@@ -178,27 +174,22 @@ private fun ShrineTopAppBar(
                                 delayMillis = 120,
                                 easing = LinearEasing
                             )
-                        ) +
-                                slideInHorizontally(
-                                    initialOffsetX = { with(density) { 30.dp.roundToPx() } },
-                                    animationSpec = tween(
-                                        durationMillis = 270,
-                                        easing = LinearEasing
-                                    )
-                                ) with
+                        ) + slideInHorizontally(
+                            initialOffsetX = { with(density) { 30.dp.roundToPx() } },
+                            animationSpec = tween(
+                                durationMillis = 270, easing = LinearEasing
+                            )
+                        ) with
                                 fadeOut(
                                     animationSpec = tween(
-                                        durationMillis = 120,
-                                        easing = LinearEasing
+                                        durationMillis = 120, easing = LinearEasing
                                     )
-                                ) +
-                                slideOutHorizontally(
-                                    targetOffsetX = { with(density) { (-30).dp.roundToPx() } },
-                                    animationSpec = tween(
-                                        durationMillis = 120,
-                                        easing = LinearEasing
-                                    )
-                                )
+                                ) + slideOutHorizontally(
+                            targetOffsetX = { with(density) { (-30).dp.roundToPx() } },
+                            animationSpec = tween(
+                                durationMillis = 120, easing = LinearEasing
+                            )
+                        )
                     } else {
                         // Reveal to conceal
                         fadeIn(
@@ -207,47 +198,43 @@ private fun ShrineTopAppBar(
                                 delayMillis = 90,
                                 easing = LinearEasing
                             )
-                        ) +
-                                slideInHorizontally(
-                                    initialOffsetX = { with(density) { (-30).dp.roundToPx() } },
-                                    animationSpec = tween(
-                                        durationMillis = 270,
-                                        easing = LinearEasing
-                                    )
-                                ) with
-                                fadeOut(
-                                    animationSpec = tween(
-                                        durationMillis = 90,
-                                        easing = LinearEasing
-                                    )
-                                ) +
-                                slideOutHorizontally(
-                                    targetOffsetX = { with(density) { 30.dp.roundToPx() } },
-                                    animationSpec = tween(
-                                        durationMillis = 90,
-                                        easing = LinearEasing
-                                    )
-                                )
+                        ) + slideInHorizontally(
+                            initialOffsetX = { with(density) { (-30).dp.roundToPx() } },
+                            animationSpec = tween(
+                                durationMillis = 270, easing = LinearEasing
+                            )
+                        ) with fadeOut(
+                            animationSpec = tween(
+                                durationMillis = 90, easing = LinearEasing
+                            )
+                        ) + slideOutHorizontally(
+                            targetOffsetX = { with(density) { 30.dp.roundToPx() } },
+                            animationSpec = tween(
+                                durationMillis = 90, easing = LinearEasing
+                            )
+                        )
                     }.using(SizeTransform(clip = false))
-                },
-                contentAlignment = Alignment.CenterStart
-            ) {
-
+                }, contentAlignment = Alignment.CenterStart
+            ) { revealed ->
+                if (!revealed) {
+                    TopAppBarText(text = "Shrine")
+                } else {
+                    MenuSearchField()
+                }
             }
-        },
-        actions = {
+        }, actions = {
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Search action",
                 tint = LocalContentColor.current.copy(alpha = ContentAlpha.high),
                 modifier = Modifier.padding(end = 12.dp)
             )
-        },
-        elevation = 0.dp
+        }, elevation = 0.dp
     )
 } // End of ShrineTopAppBar
 
 @ExperimentalMaterialApi
+@ExperimentalAnimationApi
 @Composable
 fun Backdrop() {
     val scaffoldState = rememberBackdropScaffoldState(BackdropValue.Concealed)
@@ -262,20 +249,21 @@ fun Backdrop() {
         gesturesEnabled = false,
         appBar = {
             ShrineTopAppBar(
-                backdropRevealed = scaffoldState.isRevealed,
+                backdropRevealed = backdropRevealed,
                 onBackdropReveal = {
-                    backdropRevealed = it
-                    scope.launch {
-                        if (scaffoldState.isConcealed) {
-                            scaffoldState.reveal()
-                        } else {
-                            scaffoldState.conceal()
+                    if (!scaffoldState.isAnimationRunning) {
+                        backdropRevealed = it
+                        scope.launch {
+                            if (scaffoldState.isConcealed) {
+                                scaffoldState.reveal()
+                            } else {
+                                scaffoldState.conceal()
+                            }
                         }
                     }
                 }
             )
-        },
-        frontLayerContent = {
+        }, frontLayerContent = {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -285,9 +273,9 @@ fun Backdrop() {
             }
         },
         backLayerContent = {
-            NavigationMenu(
-                modifier = Modifier.padding(top = 12.dp, bottom = 32.dp),
+            NavigationMenu(modifier = Modifier.padding(top = 12.dp, bottom = 32.dp),
                 activeCategory = activeCategory,
+                backdropRevealed = backdropRevealed,
                 onMenuSelect = {
                     backdropRevealed = false
                     activeCategory = it
@@ -297,68 +285,12 @@ fun Backdrop() {
                 }
             )
         },
-        frontLayerShape = MaterialTheme.shapes.large,
-        frontLayerElevation = 16.dp
+        frontLayerShape = MaterialTheme.shapes.large, frontLayerElevation = 16.dp
     )
 } // End of Backdrop
 
 
-@Composable
-private fun BackdropMenuItems(
-    activeMenuItem: Int = -1,
-    onMenuItemSelect: (index: Int) -> Unit = {}
-) {
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .padding(32.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        menuData.forEachIndexed { idx, item ->
-            MenuItem(
-                index = idx,
-                text = item,
-                activeMenu = activeMenuItem,
-            ) {
-                onMenuItemSelect(it)
-            }
-        }
-        Text(
-            "My Account".uppercase(),
-            style = MaterialTheme.typography.subtitle1
-
-        )
-    }
-} // End of BackdropMenuItems
-
-@Composable
-fun MenuItem(
-    index: Int = -1,
-    text: String = "Menu item",
-    activeMenu: Int = -1,
-    onClick: (index: Int) -> Unit = {}
-) {
-    Box(
-        modifier = Modifier.height(20.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        if (activeMenu == index) {
-            Image(
-                painterResource(id = R.drawable.ic_tab_indicator),
-                contentDescription = null
-            )
-        }
-        Text(
-            "$text".uppercase(),
-            style = MaterialTheme.typography.subtitle1, fontSize = 17.sp,
-            modifier = Modifier.clickable {
-                onClick(index)
-            }
-        )
-    }
-} // End of MenuItem
-
+@ExperimentalAnimationApi
 @Preview
 @Composable
 fun ShrineTopAppBarPreview() {
@@ -373,9 +305,42 @@ fun ShrineTopAppBarPreview() {
     }
 } // End of ShrineTopAppBarPreview
 
+
+@ExperimentalAnimationApi
+@Composable
+fun AnimatedVisibilityScope.MenuItem(
+    modifier: Modifier = Modifier,
+    index: Int,
+    content: @Composable () -> Unit
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .animateEnterExit(
+                enter = fadeIn(
+                    animationSpec = tween(
+                        durationMillis = 240,
+                        delayMillis = index * 15 + 60,
+                        easing = LinearEasing
+                    )
+                ),
+                exit = fadeOut(animationSpec = tween(durationMillis = 90, easing = LinearEasing)),
+                label = "Menu item $index"
+            )
+            .fillMaxWidth(0.5f)
+            .clip(MaterialTheme.shapes.medium)
+            .then(modifier)
+    ) {
+        content()
+    }
+} // End of MenuItem
+
+@ExperimentalAnimationApi
+@ExperimentalMaterialApi
 @Composable
 private fun NavigationMenu(
     modifier: Modifier = Modifier,
+    backdropRevealed: Boolean = true,
     activeCategory: Category = Category.All,
     onMenuSelect: (Category) -> Unit = {}
 ) {
@@ -385,30 +350,93 @@ private fun NavigationMenu(
             .then(modifier),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val categories = Category.values()
+        val categoies = Category.values()
 
+        AnimatedVisibility(
+            visible = backdropRevealed,
+            enter = EnterTransition.None,
+            exit = ExitTransition.None,
+            label = "NavMenuTransition"
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Category.values().forEachIndexed { idx, category ->
+                    MenuItem(
+                        modifier = Modifier.clickable { onMenuSelect(category) },
+                        index = idx,
+                    ) {
+                        MenuText(
+                            text = category.toString(),
+                            activeDecoration = {
+                                if (category == activeCategory) {
+                                    Image(
+                                        painterResource(id = R.drawable.ic_tab_indicator),
+                                        contentDescription = "Active category icon"
+                                    )
+                                }
+                            }
+                        )
+                    }
+                }
+                MenuItem(
+                    index = categoies.size
+                ) {
+                    Divider(
+                        modifier = Modifier
+                            .width(56.dp)
+                            .padding(vertical = 12.dp),
+                        color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled)
+                    )
+                }
+                MenuItem(
+                    index = categoies.size + 1
+                ) {
+                    MenuText("Logout")
+                }
+            }
+        }
     }
 } // End of NavigationMenu
 
+
 @Composable
 private fun MenuText(
-    text: String = "Item",
-    activeDecoration: @Composable () -> Unit = {}
+    text: String = "Item", activeDecoration: @Composable () -> Unit = {}
 ) {
     Box(
-        modifier = Modifier.height(44.dp),
-        contentAlignment = Alignment.Center
+        modifier = Modifier.height(44.dp), contentAlignment = Alignment.Center
     ) {
         activeDecoration()
         Text(
-            text = text.uppercase(),
-            style = MaterialTheme.typography.subtitle1
+            text = text.uppercase(), style = MaterialTheme.typography.subtitle1
         )
     }
 } // End of MenuText
 
+@ExperimentalAnimationApi
+@ExperimentalMaterialApi
+@Preview
+@Composable
+fun NavigationMenuPreview() {
+    ShrineTheme {
+        Surface(
+            color = MaterialTheme.colors.background
+        ) {
+            var activeCategory by remember {
+                mutableStateOf(Category.Acceessories)
+            }
+            NavigationMenu(
+                modifier = Modifier.padding(vertical = 8.dp),
+                activeCategory = activeCategory,
+                onMenuSelect = { activeCategory = it }
+            )
+        }
+    }
+} // End of NavigationMenuPreview
 
-@OptIn(ExperimentalAnimationApi::class)
+
+@ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Preview
 @Composable
@@ -417,22 +445,3 @@ fun BackdropPreview() {
         Backdrop()
     }
 } // End of BackdropPreview
-
-
-@Preview
-@Composable
-fun BackdropMenuItemsPreview() {
-    ShrineTheme {
-        Surface {
-            BackdropMenuItems()
-        }
-    }
-} // End of BackdropMenuItemsPreview
-
-@Preview(showBackground = true)
-@Composable
-fun MenuItemPreview() {
-    ShrineTheme {
-        MenuItem()
-    }
-} // End of MenuItemPreview

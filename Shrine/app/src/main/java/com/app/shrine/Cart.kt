@@ -29,6 +29,42 @@ import com.app.shrine.ui.theme.ShrineTheme
 
 
 @Composable
+private fun CartHeader(
+    cartSize: Int
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = {}, Modifier.padding(4.dp)) {
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowDown,
+                contentDescription = "Collapse cart icon"
+            )
+        }
+        Text(
+            "Cart".uppercase(),
+            style = MaterialTheme.typography.subtitle1
+        )
+        Spacer(Modifier.width(12.dp))
+        Text("$cartSize items".uppercase())
+    }
+} // End of CartHeader
+
+@Preview(name = "Cart header")
+@Composable
+fun CartHeaderPreview() {
+    ShrineTheme {
+        Surface(
+            Modifier.fillMaxWidth(),
+            color = MaterialTheme.colors.secondary
+        ) {
+            CartHeader(cartSize = 15)
+        }
+    }
+} // End of CartHeaderPreview
+
+
+@Composable
 fun Cart() {
     Surface(color = MaterialTheme.colors.surface) {
         // width 전체를 차지하는 버튼
