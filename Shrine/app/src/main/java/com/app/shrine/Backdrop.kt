@@ -236,7 +236,11 @@ private fun ShrineTopAppBar(
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
 @Composable
-fun Backdrop() {
+fun Backdrop(
+    showScrim: Boolean = false,
+    onAddCartItem: (FirstAddCartItemData) -> Unit = {},
+    onBackdropReveal: (Boolean) -> Unit = {}
+) {
     val scaffoldState = rememberBackdropScaffoldState(BackdropValue.Concealed)
     var backdropRevealed by rememberSaveable { mutableStateOf(scaffoldState.isRevealed) }
     val scope = rememberCoroutineScope()
@@ -253,6 +257,7 @@ fun Backdrop() {
                 onBackdropReveal = {
                     if (!scaffoldState.isAnimationRunning) {
                         backdropRevealed = it
+                        onBackdropReveal(it)
                         scope.launch {
                             if (scaffoldState.isConcealed) {
                                 scaffoldState.reveal()
@@ -424,8 +429,9 @@ fun NavigationMenuPreview() {
             color = MaterialTheme.colors.background
         ) {
             var activeCategory by remember {
-                mutableStateOf(Category.Acceessories)
+                mutableStateOf(Category.Accessories)
             }
+
             NavigationMenu(
                 modifier = Modifier.padding(vertical = 8.dp),
                 activeCategory = activeCategory,
