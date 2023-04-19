@@ -9,14 +9,18 @@ import android.location.LocationManager
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.plcoding.weatherapp.domain.location.LocationTracker
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
 import kotlin.coroutines.resume
 
+
+@ExperimentalCoroutinesApi
 class DefaultLocationTracker @Inject constructor(
     private val locationClient: FusedLocationProviderClient,
     private val application: Application
 ) : LocationTracker {
+
     override suspend fun getCurrentLocation(): Location? {
         val hasAccessFineLocationPermission = ContextCompat.checkSelfPermission(
             application,
@@ -24,7 +28,7 @@ class DefaultLocationTracker @Inject constructor(
         ) == PackageManager.PERMISSION_GRANTED
 
 
-        val hasAccessFineLocationPermission = ContextCompat.checkSelfPermission(
+        val hasAccessCoarseLoationPermission = ContextCompat.checkSelfPermission(
             application,
             Manifest.permission.ACCESS_COARSE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
@@ -38,7 +42,7 @@ class DefaultLocationTracker @Inject constructor(
                 LocationManager.GPS_PROVIDER
             )
 
-        if (!hasAccessFineLocationPermission || !hasAccessFineLocationPermission || !isGpsEnabled) {
+        if (!hasAccessFineLocationPermission || !hasAccessCoarseLoationPermission || !isGpsEnabled) {
             return null
         }
 

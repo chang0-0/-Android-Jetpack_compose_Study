@@ -4,8 +4,9 @@ import com.plcoding.weatherapp.data.mappers.toWeatherInfo
 import com.plcoding.weatherapp.data.remote.WeatherApi
 import com.plcoding.weatherapp.domain.util.Resource
 import com.plcoding.weatherapp.domain.weather.WeatherInfo
+import javax.inject.Inject
 
-class WeatherRepositoryImpl(private val api: WeatherApi) :
+class WeatherRepositoryImpl @Inject constructor(private val api: WeatherApi) :
     WeatherRepository { // End of WeatherRepositoryImpl class
 
     override suspend fun getWeatherData(lat: Double, long: Double): Resource<WeatherInfo> {
