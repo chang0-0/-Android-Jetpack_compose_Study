@@ -435,8 +435,6 @@ fun CartBottomSheet(
                     )
                 }
             }
-
-
         }
     }
 } // End of CartExpandingBottomSheet
