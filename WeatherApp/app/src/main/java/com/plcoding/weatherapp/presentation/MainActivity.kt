@@ -27,6 +27,8 @@ class MainActivity : ComponentActivity() {
 
     // viewModel
     private val viewModel: WeatherViewModel by viewModels()
+
+    // permissionLauncher
     private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,7 +61,6 @@ class MainActivity : ComponentActivity() {
                         Spacer(modifier = Modifier.height(16.dp))
                         WeatherForecast(state = viewModel.state)
                     }
-
                     if (viewModel.state.isLoading) {
                         CircularProgressIndicator(
                             modifier = Modifier.align(Alignment.Center)
