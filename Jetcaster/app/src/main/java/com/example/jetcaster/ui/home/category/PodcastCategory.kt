@@ -386,7 +386,7 @@ private val MediumDateFormatter by lazy {
     DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun PreviewEpisodeListItem() {
     JetcasterTheme {
