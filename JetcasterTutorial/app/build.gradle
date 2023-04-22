@@ -28,12 +28,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
+
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
     buildFeatures {
         compose true
@@ -73,9 +75,11 @@ dependencies {
 
     // Compose Navigation
     def androidx_lifecycle_version = "2.6.1"
-
     implementation "androidx-lifecycle-compose:$androidx_lifecycle_version"
     implementation "androidx-lifecycle-runtime-compose:$androidx_lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$androidx_lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$androidx_lifecycle_version"
+
 
     def androidx_navigation_version = "2.5.3"
     implementation "androidx.navigation:navigation-compose:$androidx_navigation_version"
@@ -100,5 +104,3 @@ dependencies {
     implementation "androidx.window:window:1.1.0-beta02"
 
 }
-
-

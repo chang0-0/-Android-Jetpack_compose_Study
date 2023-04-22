@@ -13,12 +13,12 @@ fun PodcastCategory(
     navigationToPlayer: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val viewModel : PodcastCategoryViewModel = viewModel(
-
-    )
-
-
-    val viewState by viewModel.state.collectAsStateWithLifecycle()
+//    val viewModel : PodcastCategoryViewModel = viewModel(
+//
+//    )
+//
+//
+//    val viewState by viewModel.state.collectAsStateWithLifecycle()
 
     Column(modifier = modifier) {
 
