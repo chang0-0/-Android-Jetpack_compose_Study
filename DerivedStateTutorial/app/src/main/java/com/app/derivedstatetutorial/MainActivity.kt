@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.app.derivedstatetutorial.ui.theme.DerivedStateTutorialTheme
 
 private const val TAG = "MainActivity_싸피"
 
@@ -27,7 +28,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            TestScreen()
+            DerivedStateTutorialTheme() {
+                TestScreen()
+            }
         }
     } // End of onCreate
 } // End of Main class
@@ -50,12 +53,10 @@ fun TestScreen() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Button(
-            onClick = {
-                Log.d(TAG, "Clicked")
-                count += 1
-            }
-        ) {
+        Button(onClick = {
+            Log.d(TAG, "Clicked")
+            count += 1
+        }) {
             Text(text = "Increment")
         }
         Spacer(modifier = Modifier.height(30.dp))
