@@ -173,10 +173,7 @@ fun Catalog(
                 }
             }
         }
-
     }
-
-
 } // End of Catalog
 
 
@@ -216,5 +213,3 @@ fun CatalogPreview() {
         }
     }
 }
-
-
