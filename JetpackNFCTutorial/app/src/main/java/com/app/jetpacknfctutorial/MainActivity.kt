@@ -25,7 +25,6 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var navController: NavHostController
 
-    @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        val action = intent.action
