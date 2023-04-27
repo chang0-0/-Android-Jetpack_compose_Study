@@ -5,7 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.app.jetpacknfctutorial.HomeScreen
-import com.app.jetpacknfctutorial.MainTextBody
+import com.app.jetpacknfctutorial.MainScreen
 import com.app.jetpacknfctutorial.ui.screens.SecondScreen
 
 
@@ -20,7 +20,7 @@ fun SetUpNavGraph(
         composable(
             route = HomeScreen.Home.route
         ) {
-            MainTextBody(
+            MainScreen(
                 navController = navController
             )
         }
