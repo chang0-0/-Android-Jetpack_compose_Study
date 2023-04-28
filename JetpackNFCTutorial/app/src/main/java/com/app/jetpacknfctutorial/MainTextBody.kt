@@ -13,14 +13,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -32,15 +35,55 @@ private const val TAG = "MainTextBody_싸피"
 
 @Composable
 fun MainScreen(nfcViewModel: NfcViewModel = viewModel(), navController: NavHostController) {
-    val nfcPayload by nfcViewModel.nfcData.observeAsState("")
-    //Log.d(TAG, "nfcPayload: $nfcPayload")
+    val nfcPayload = nfcViewModel.nfcData.observeAsState("")
+    Log.d(TAG, "nfcPayload: ${nfcPayload.value}")
 
-    MainTextBody(
-        navController = navController,
-        nfcPayload,
-        nfcDataOnChange = {
-            nfcViewModel.setNfcPayLoad(it)
-        })
+    val nfcData = nfcViewModel.updateNfcFlow.value
+    val test2 = nfcViewModel.nfcData.observeAsState("").value
+
+    test2.let {
+        MainTextBody(
+            navController = navController,
+            test2,
+            nfcDataOnChange = {
+                nfcViewModel.setNfcPayLoad(it)
+            })
+    }
+
+    if (nfcData != "") {
+        MainTextBody(
+            navController = navController,
+            test2,
+            nfcDataOnChange = {
+                nfcViewModel.setNfcPayLoad(it)
+            }
+        )
+    }
+
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    val lastestLifeCycleEvent = remember {
+        mutableStateOf(Lifecycle.Event.ON_ANY)
+    }
+
+    DisposableEffect(lifecycle) {
+        val observer = LifecycleEventObserver { _, event ->
+            lastestLifeCycleEvent.value = event
+        }
+        lifecycle.addObserver(observer)
+        onDispose {
+            lifecycle.removeObserver(observer)
+        }
+    }
+
+    val lifecycleEvent = rememberLifecycleEvent()
+
+    LaunchedEffect(lifecycleEvent) {
+//        if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
+//            nfcViewModel.refresh()
+//        }
+    }
+
+
 } // End of MainScreen
 
 @Composable
@@ -62,9 +105,7 @@ fun MainTextBody(
     ) {
         //nfcRead(LocalContext.current)
         Text(text = "test", fontSize = MaterialTheme.typography.h3.fontSize, color = Color.Black)
-        GetNfcData(
-            intent
-        )
+        GetNfcData(intent)
         Spacer(modifier = Modifier.padding(10.dp))
         Button(onClick = {
             navController.navigate(route = HomeScreen.Second.route)
@@ -87,9 +128,29 @@ private fun nfcRead(context: Context) {
 
     i.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
     pendingIntent = PendingIntent.getActivity(context, 0, i, PendingIntent.FLAG_MUTABLE)
-
     val main = context as MainActivity
 } // End of nfcRead
+
+
+@Composable
+fun rememberLifecycleEvent(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current): Lifecycle.Event {
+    var state by remember {
+        mutableStateOf(Lifecycle.Event.ON_ANY)
+    }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            state = event
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    return state
+} // End of rememberLifecycleEvent
 
 @Composable
 private fun GetNfcData(intent: Intent) {
