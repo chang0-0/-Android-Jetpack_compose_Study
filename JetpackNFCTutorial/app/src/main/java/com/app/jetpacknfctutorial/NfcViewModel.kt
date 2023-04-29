@@ -39,9 +39,5 @@ class NfcViewModel : ViewModel() {
 
     val countDownFlow = flow<Int> {
         val startingValue = 10
-
-
     }
-
-
 } // End of NfcViewModel class

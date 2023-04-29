@@ -5,9 +5,14 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
-import android.nfc.*
+import android.nfc.NdefMessage
+import android.nfc.NdefRecord
+import android.nfc.NfcAdapter
+import android.nfc.NfcManager
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -20,8 +25,8 @@ import java.util.*
 private const val TAG = "MainActivity_싸피"
 
 class MainActivity : ComponentActivity() {
-    private lateinit var nAdapter: NfcAdapter
-    private lateinit var pIntent: PendingIntent
+    private lateinit var nfcAdapter: NfcAdapter
+    private lateinit var pendingIntent: PendingIntent
     private lateinit var filters: Array<IntentFilter>
     private lateinit var navController: NavHostController
     private val nfcViewModel by viewModels<NfcViewModel>()
@@ -35,93 +40,80 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        initNfcAdapter()
 
-        nAdapter = NfcAdapter.getDefaultAdapter(this)
-        val intent = Intent(this, javaClass)
-        pIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE)
-        val filter = IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED)
-        filters = arrayOf(filter)
-        processNFC(getIntent())
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this)
+
+        if (nfcAdapter == null) {
+            Toast.makeText(this, "NFC Tag", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
+//        pendingIntent = PendingIntent.getActivity(
+//            this,
+//            0,
+//            Intent(this, this.javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
+//            0
+//        )
+
+
     } // End of onCreate
 
     override fun onResume() {
         super.onResume()
         Log.d(TAG, "onResume: ")
-        //nAdapter.enableForegroundDispatch(this, pIntent, filters, null)
 
-//        NfcAdapter.getDefaultAdapter(this)?.let { nfcAdapter ->
+
+//        if (nfcAdapter != null) {
+//            if (!nfcAdapter.isEnabled) {
 //
-//            val launchIntent = Intent(this, this.javaClass)
-//            launchIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-//
-//            val pendingIntent = PendingIntent.getActivity(
-//                this, 0, launchIntent, PendingIntent.FLAG_CANCEL_CURRENT
-//            )
-//
-//
-//            val filters = arrayOf(IntentFilter(ACTION_TECH_DISCOVERED))
-//            val techTypes = arrayOf(arrayOf(IsoDep::class.java.name))
-//
-//            nfcAdapter.enableForegroundDispatch(
-//                this, pendingIntent, filters, techTypes
-//            )
+//                showWirelessSettings()
+//                nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null)
+//            }
 //        }
-
-
-        enableNfcForegroundDispatch()
 
     } // End of onResume
 
-    private fun enableNfcForegroundDispatch() {
-        try {
-            val intent = Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            val nfcPendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
-            adapter?.enableForegroundDispatch(this, nfcPendingIntent, null, null)
-        } catch (e: Exception) {
-            Log.d(TAG, "enableNfcForegroundDispatch: Error")
-        }
-    } // End of enableNfcForegroundDispatch
-
     override fun onPause() {
-        Log.d(TAG, "onPause: ")
-//        if (this.isFinishing) {
-//            nAdapter.disableForegroundDispatch(this)
-//        }
-
-        if (nAdapter != null) {
-            nAdapter.disableForegroundDispatch(this)
-        }
-
         super.onPause()
+        Log.d(TAG, "onPause: ")
+
+        if (nfcAdapter != null) {
+            nfcAdapter.disableForegroundDispatch(this)
+        }
     } // End of onPause
+
+
+    private fun showWirelessSettings() {
+        Toast.makeText(this, "You need to enable NFC", Toast.LENGTH_SHORT).show()
+        val intent = Intent(Settings.ACTION_WIRELESS_SETTINGS)
+        startActivity(intent)
+    } // End of showWirelessSettings
+
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
+        Log.d(TAG, "onNewIntent: ")
 
-        if (intent!!.action == NfcAdapter.ACTION_TAG_DISCOVERED) {
-            val messages = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
-            Log.d(TAG, "onNewIntent: $messages")
-
-            for (i in messages!!.indices) {
-                showMsg(messages[i] as NdefMessage)
-            }
-        }
-
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED == intent.action) {
-            intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)?.also { rawMessage ->
-
-                val messages: List<NdefMessage> = rawMessage.map {
-                    it as NdefMessage
-                }
-            }
-        }
-
-        val tag: Tag? = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
-        Log.d(TAG, "tag : $tag ")
-
-        processNFC(intent!!)
+        setIntent(intent)
+        resolveIntent(intent!!)
     } // End of onNewIntent
+
+    private fun resolveIntent(intent: Intent) {
+        val action = intent.action
+
+        if (NfcAdapter.ACTION_TAG_DISCOVERED == action ||
+            NfcAdapter.ACTION_TECH_DISCOVERED == action ||
+            NfcAdapter.ACTION_NDEF_DISCOVERED == action
+        ) {
+            val rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
+            var msgs: Array<NdefMessage> = arrayOf()
+
+
+
+            Log.d(TAG, "resolveIntent: ${rawMsgs}")
+        }
+    } // End of resolveIntent
 
     fun showMsg(mMessage: NdefMessage) {
         val recs = mMessage.records
@@ -179,23 +171,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     } // End of processNFC
-
-    private var adapter: NfcAdapter? = null
-
-    private fun initNfcAdapter() {
-        val nfcManager = getSystemService(Context.NFC_SERVICE) as NfcManager
-        adapter = nfcManager.defaultAdapter
-    } // End of initNfcAdapter
-
-    private fun parseData(intent: Intent) {
-        val data = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
-
-        data!!.takeWhile {
-            val message = it as NdefMessage
-            val record = message.records
-            Log.d(TAG, "parseData: ${String(record[0].payload)} ")
-
-            false
-        }
-    } // End of parseData
 } // End of MainActivity class
