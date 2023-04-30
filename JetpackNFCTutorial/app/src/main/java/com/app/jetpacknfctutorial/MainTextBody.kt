@@ -1,25 +1,21 @@
 package com.app.jetpacknfctutorial
 
-import android.app.Activity
 import android.app.PendingIntent
-import android.content.Context
-import android.content.ContextWrapper
 import android.nfc.NfcAdapter
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -31,26 +27,16 @@ private const val TAG = "MainTextBody_싸피"
 
 @Composable
 fun MainScreen(nfcViewModel: NfcViewModel = viewModel(), navController: NavHostController) {
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    val lastestLifeCycleEvent = remember {
-        mutableStateOf(Lifecycle.Event.ON_ANY)
-    }
+    val currentNfcValue = nfcViewModel.nfcData.observeAsState("")
+    Log.d(TAG, "currentNfcValue of MainScreen: ${currentNfcValue.value}")
 
-    DisposableEffect(lifecycle) {
-        val observer = LifecycleEventObserver { _, event ->
-            lastestLifeCycleEvent.value = event
-        }
-        lifecycle.addObserver(observer)
-        onDispose {
-            lifecycle.removeObserver(observer)
+    currentNfcValue.value.let { nfcValue ->
+        Surface {
+            MainTextBody(navController = navController, nfcData = nfcValue)
         }
     }
-
-    MainTextBody(
-        navController,
-        "",
-    )
 } // End of MainScreen
+
 
 @Composable
 fun MainTextBody(
@@ -58,7 +44,6 @@ fun MainTextBody(
     nfcData: String,
 ) {
     val context = LocalContext.current
-    val activity = context.findActivity()
 
     Column(
         Modifier.fillMaxSize(),
@@ -77,31 +62,3 @@ fun MainTextBody(
         Text(text = nfcData)
     }
 } // End of MainTextScreen
-
-
-@Composable
-fun rememberLifecycleEvent(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current): Lifecycle.Event {
-    var state by remember {
-        mutableStateOf(Lifecycle.Event.ON_ANY)
-    }
-
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            state = event
-        }
-
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
-
-    return state
-} // End of rememberLifecycleEvent
-
-
-private fun Context.findActivity(): Activity? = when (this) {
-    is Activity -> this
-    is ContextWrapper -> baseContext.findActivity()
-    else -> null
-} // End of Context.findActivity

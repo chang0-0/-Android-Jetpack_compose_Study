@@ -2,11 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.NFC" />
-    <uses-permission
-        android:name="android.hardware.nfc"
-        android:required="true" />
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -14,26 +9,19 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.JetpackNFCTutorial"
+        android:theme="@style/Theme.StateFlowObserveTutorial"
         tools:targetApi="31">
-
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.JetpackNFCTutorial">
+            android:theme="@style/Theme.StateFlowObserveTutorial">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
-            <intent-filter>
-                <category android:name="android.intent.category.DEFAULT" />
-                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
-                <data android:mimeType="text/plain" />
-            </intent-filter>
-
         </activity>
     </application>
+
 </manifest>

@@ -15,9 +15,12 @@ private const val TAG = "NfcViewModel_싸피"
 
 class NfcViewModel : ViewModel() {
     private val _nfcData = MutableLiveData<String>()
-    val nfcData: LiveData<String> = _nfcData
+    val nfcData: LiveData<String>
+        get() = _nfcData
 
-    private fun nfcDataSetData(newValue: String) {
+    fun nfcDataSetData(newValue: String) {
+        Log.d(TAG, "nfcDataSetData: $newValue")
+        Log.d(TAG, "nfcDataSetData: ${_nfcData.value}")
         _nfcData.value = newValue
     } // End of nfcDataSetData
 
