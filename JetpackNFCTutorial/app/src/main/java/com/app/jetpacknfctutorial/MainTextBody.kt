@@ -38,15 +38,17 @@ fun MainScreen(nfcViewModel: NfcViewModel = viewModel(), navController: NavHostC
         }
     }
 
-
     val nfcData = nfcViewModel.nfcLiveData.observeAsState()
 
-    Column {
-        Text(text = "NFC 테스트 코드")
-        nfcData.value?.let { it ->
-            Text(text = it)
+    nfcData.value.let {
+        Column {
+            Text(text = "NFC 테스트 코드")
+            nfcData.value?.let { it ->
+                Text(text = it)
+            }
         }
     }
+
 } // End of MainScreen
 
 
@@ -56,12 +58,9 @@ fun NFCText(value: String) {
     Log.d(TAG, "NFCText: ${state.value}")
     Log.d(TAG, "NFCText: $value")
 
-//    LaunchedEffect(key1 = Unit) {
-//
-//    }
     Text(text = value)
     Text(text = state.value.toString())
-} // End of
+} // End of NFCText
 
 @Composable
 fun MainTextBody(

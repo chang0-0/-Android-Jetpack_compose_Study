@@ -72,6 +72,7 @@ class MainActivity : ComponentActivity() {
 //        processNFC(intent!!)
 //        processNFC(Intent())
 
+        setIntent(intent)
         processNFC(getIntent())
     } // End of onNewIntent
 
@@ -103,7 +104,7 @@ class MainActivity : ComponentActivity() {
                     when (type) {
                         "T" -> {
                             val payload = rec.payload
-                            Log.d(TAG, "processNFC payload: ${String(payload)}")
+                            Log.d(TAG, "processNFC type T : ${String(payload)}")
                         }
                         "U" -> {
                             val uri = rec.toUri()
