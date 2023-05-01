@@ -39,7 +39,6 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
         if (nfcAdapter == null) {
             Toast.makeText(this, "NFC Tag", Toast.LENGTH_SHORT).show()
