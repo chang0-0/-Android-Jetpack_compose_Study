@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
-import android.nfc.Tag
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -26,10 +25,6 @@ class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
     private val nfcViewModel by viewModels<NfcViewModel>()
 
-    private lateinit var writingTagFilter: IntentFilter
-    private var writeModel: Boolean? = null
-    private lateinit var myTag: Tag
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -45,19 +40,40 @@ class MainActivity : ComponentActivity() {
             finish()
         }
 
-        processNFC(intent)
+        val intent = Intent(this, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        startActivity(intent)
+
         pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE)
-        val tagDetected = IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED)
-        tagDetected.addCategory(Intent.CATEGORY_DEFAULT)
+
+        val filter = IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED) // 제일 마지막 호출(태그면 다 불림)
+        filters = arrayOf(filter)
+
+        Log.d(TAG, "onCreate: ")
     } // End of onCreate
 
-//    override fun onNewIntent(intent: Intent?) {
-//        super.onNewIntent(intent)
-//        Log.d(TAG, "onNewIntent: ")
-//
+    override fun onResume() {
+        super.onResume()
+        nfcAdapter.enableForegroundDispatch(this, pendingIntent, filters, null)
+    } // End of onResume
+
+    override fun onPause() {
+        super.onPause()
+        nfcAdapter.disableForegroundDispatch(this)
+    } // End of onPause
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
 //        setIntent(intent)
-//        resolveIntent(intent!!)
-//    } // End of onNewIntent
+//        setIntent(intent)
+//        getIntent()
+//        setIntent(Intent())
+
+//        processNFC(intent!!)
+//        processNFC(Intent())
+
+        processNFC(getIntent())
+    } // End of onNewIntent
 
     private fun processNFC(intent: Intent) {
         val message = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
@@ -76,6 +92,12 @@ class MainActivity : ComponentActivity() {
                     nfcViewModel.setNfcPayLoad(strPload.substring(3))
                     nfcViewModel.setUpdateNfcPayLoad(strPload.substring(3))
                     nfcViewModel.nfcDataSetData(strPload.substring(3))
+
+                    // nfcViewModel
+                    nfcViewModel.setViewState(strPload.substring(3))
+
+                    // nfcViewModel setNfcData
+                    nfcViewModel.setNfcData(nfcData = strPload.substring(3))
 
                     val type = String(rec.type)
                     when (type) {

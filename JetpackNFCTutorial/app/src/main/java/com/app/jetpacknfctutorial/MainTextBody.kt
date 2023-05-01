@@ -11,6 +11,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,15 +29,39 @@ private const val TAG = "MainTextBody_싸피"
 @Composable
 fun MainScreen(nfcViewModel: NfcViewModel = viewModel(), navController: NavHostController) {
     val currentNfcValue = nfcViewModel.nfcData.observeAsState("")
-    Log.d(TAG, "currentNfcValue of MainScreen: ${currentNfcValue.value}")
-
+    
     currentNfcValue.value.let { nfcValue ->
         Surface {
             MainTextBody(navController = navController, nfcData = nfcValue)
+            NFCText(currentNfcValue.value)
+            // Text(text = nfcViewModel.viewState.value)
+        }
+    }
+
+
+    val nfcData = nfcViewModel.nfcLiveData.observeAsState()
+
+    Column {
+        Text(text = "NFC 테스트 코드")
+        nfcData.value?.let { it ->
+            Text(text = it)
         }
     }
 } // End of MainScreen
 
+
+@Composable
+fun NFCText(value: String) {
+    val state = rememberUpdatedState(newValue = value)
+    Log.d(TAG, "NFCText: ${state.value}")
+    Log.d(TAG, "NFCText: $value")
+
+//    LaunchedEffect(key1 = Unit) {
+//
+//    }
+    Text(text = value)
+    Text(text = state.value.toString())
+} // End of
 
 @Composable
 fun MainTextBody(

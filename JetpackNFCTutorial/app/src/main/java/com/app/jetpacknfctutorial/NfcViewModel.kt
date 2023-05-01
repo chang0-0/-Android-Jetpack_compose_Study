@@ -6,10 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 
 private const val TAG = "NfcViewModel_싸피"
 
@@ -43,4 +40,23 @@ class NfcViewModel : ViewModel() {
     val countDownFlow = flow<Int> {
         val startingValue = 10
     }
+
+    private val _viewState = MutableStateFlow("")
+    val viewState = _viewState.asStateFlow()
+
+    fun setViewState(newValue: String) {
+        _viewState.update {
+            newValue
+        }
+    } // End of setViewState
+
+
+    private val _nfcLiveData = MutableLiveData<String>()
+    val nfcLiveData: LiveData<String> = _nfcLiveData
+
+    fun setNfcData(nfcData: String) {
+        _nfcData.value = nfcData
+    } // End of setNfcData
+
+
 } // End of NfcViewModel class
