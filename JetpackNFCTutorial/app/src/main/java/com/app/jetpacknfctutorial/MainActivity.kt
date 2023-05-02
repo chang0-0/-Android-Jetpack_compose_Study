@@ -48,8 +48,6 @@ class MainActivity : ComponentActivity() {
 
         val filter = IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED) // 제일 마지막 호출(태그면 다 불림)
         filters = arrayOf(filter)
-
-        Log.d(TAG, "onCreate: ")
     } // End of onCreate
 
     override fun onResume() {
@@ -58,33 +56,9 @@ class MainActivity : ComponentActivity() {
         nfcAdapter.enableForegroundDispatch(this, pendingIntent, filters, null)
     } // End of onResume
 
-    override fun onStart() {
-        super.onStart()
-    } // End of onStart
-
-    override fun onPause() {
-        Log.d(TAG, "onPause: ")
-        super.onPause()
-        nfcAdapter.disableForegroundDispatch(this)
-    } // End of onPause
-
-    override fun onStop() {
-        super.onStop()
-        Log.d(TAG, "onStop: ")
-    } // End of onStop
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d(TAG, "onDestroy: ")
-    } // End of onDestroy
-
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        Log.d(TAG, "onDetachedFromWindow: ")
-    }
-
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
+        Log.d(TAG, "onNewIntent: ")
 
         setIntent(intent)
         processNFC(getIntent())

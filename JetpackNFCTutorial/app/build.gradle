@@ -65,4 +65,8 @@ dependencies {
 
     implementation "androidx.compose.runtime:runtime-livedata:$compose_ui_version"
 
+    // Material 3
+    implementation "androidx.compose.material3:material3:1.0.0-alpha12"
+    implementation "androidx.compose.material3:material3-window-size-class:1.0.0-alpha12"
+    implementation "com.google.accompanist:accompanist-flowlayout:0.24.8-beta"
 }

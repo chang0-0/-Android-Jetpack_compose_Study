@@ -38,34 +38,7 @@ fun MainScreen(
 ) {
     val nfcValue = nfcViewModel.nfcData.observeAsState()
     MainTextBody(navController = navController, nfcData = nfcValue.value.toString())
-
-    OnLifecycleEvent { owner, event ->
-        // do stuff on event
-        when (event) {
-            Lifecycle.Event.ON_CREATE -> {
-                Log.d(TAG, "MainScreen: ON_CREATE ")
-            }
-            Lifecycle.Event.ON_START -> {
-                Log.d(TAG, "MainScreen: ON_START ")
-            }
-            Lifecycle.Event.ON_RESUME -> {
-                Log.d(TAG, "MainScreen: ON_RESUME ")
-            }
-            Lifecycle.Event.ON_PAUSE -> {
-                Log.d(TAG, "MainScreen: ON_PAUSE")
-            }
-            Lifecycle.Event.ON_STOP -> {
-                Log.d(TAG, "MainScreen: ON_STOP")
-            }
-            Lifecycle.Event.ON_DESTROY -> {
-                Log.d(TAG, "MainScreen: ON_DESTROY")
-            }
-            else -> return@OnLifecycleEvent
-        }
-    }
-
 } // End of MainScreen
-
 
 @Composable
 fun MainTextBody(
@@ -91,21 +64,3 @@ fun MainTextBody(
         Text(text = nfcData)
     }
 } // End of MainTextScreen
-
-@Composable
-fun OnLifecycleEvent(onEvent: (owner: LifecycleOwner, event: Lifecycle.Event) -> Unit) {
-    val eventHandler = rememberUpdatedState(onEvent)
-    val lifecycleOwner = rememberUpdatedState(LocalLifecycleOwner.current)
-
-    DisposableEffect(lifecycleOwner.value) {
-        val lifecycle = lifecycleOwner.value.lifecycle
-        val observer = LifecycleEventObserver { owner, event ->
-            eventHandler.value(owner, event)
-        }
-
-        lifecycle.addObserver(observer)
-        onDispose {
-            lifecycle.removeObserver(observer)
-        }
-    }
-}
