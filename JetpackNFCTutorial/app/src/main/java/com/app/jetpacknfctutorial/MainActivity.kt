@@ -53,24 +53,38 @@ class MainActivity : ComponentActivity() {
     } // End of onCreate
 
     override fun onResume() {
+        Log.d(TAG, "onResume: ")
         super.onResume()
         nfcAdapter.enableForegroundDispatch(this, pendingIntent, filters, null)
     } // End of onResume
 
+    override fun onStart() {
+        super.onStart()
+    } // End of onStart
+
     override fun onPause() {
+        Log.d(TAG, "onPause: ")
         super.onPause()
         nfcAdapter.disableForegroundDispatch(this)
     } // End of onPause
 
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop: ")
+    } // End of onStop
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG, "onDestroy: ")
+    } // End of onDestroy
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        Log.d(TAG, "onDetachedFromWindow: ")
+    }
+
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-//        setIntent(intent)
-//        setIntent(intent)
-//        getIntent()
-//        setIntent(Intent())
-
-//        processNFC(intent!!)
-//        processNFC(Intent())
 
         setIntent(intent)
         processNFC(getIntent())
@@ -90,15 +104,9 @@ class MainActivity : ComponentActivity() {
 
                     val strPload = String(rec.payload)
                     Log.d(TAG, "processNFC: ${strPload.substring(3)}")
-                    nfcViewModel.setNfcPayLoad(strPload.substring(3))
-                    nfcViewModel.setUpdateNfcPayLoad(strPload.substring(3))
-                    nfcViewModel.nfcDataSetData(strPload.substring(3))
-
-                    // nfcViewModel
-                    nfcViewModel.setViewState(strPload.substring(3))
 
                     // nfcViewModel setNfcData
-                    nfcViewModel.setNfcData(nfcData = strPload.substring(3))
+                    nfcViewModel.setNfcData(newNfcData = strPload.substring(3))
 
                     val type = String(rec.type)
                     when (type) {
