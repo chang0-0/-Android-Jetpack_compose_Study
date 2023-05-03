@@ -51,14 +51,12 @@ class MainActivity : ComponentActivity() {
     } // End of onCreate
 
     override fun onResume() {
-        Log.d(TAG, "onResume: ")
         super.onResume()
         nfcAdapter.enableForegroundDispatch(this, pendingIntent, filters, null)
     } // End of onResume
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        Log.d(TAG, "onNewIntent: ")
 
         setIntent(intent)
         processNFC(getIntent())
@@ -81,6 +79,7 @@ class MainActivity : ComponentActivity() {
 
                     // nfcViewModel setNfcData
                     nfcViewModel.setNfcData(newNfcData = strPload.substring(3))
+                    nfcViewModel.setNfcState(newNfcState = strPload.substring(3))
 
                     val type = String(rec.type)
                     when (type) {
