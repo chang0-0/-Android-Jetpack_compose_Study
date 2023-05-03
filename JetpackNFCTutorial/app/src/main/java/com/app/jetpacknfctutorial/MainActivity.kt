@@ -79,7 +79,7 @@ class MainActivity : ComponentActivity() {
 
                     // nfcViewModel setNfcData
                     nfcViewModel.setNfcData(newNfcData = strPload.substring(3))
-                    nfcViewModel.setNfcState(newNfcState = strPload.substring(3))
+                    nfcViewModel.setNfcState(newNFCState = strPload.substring(3))
 
                     val type = String(rec.type)
                     when (type) {

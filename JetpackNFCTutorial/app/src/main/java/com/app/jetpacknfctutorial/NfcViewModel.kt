@@ -22,7 +22,7 @@ class NfcViewModel : ViewModel() {
     private val _nfcState = MutableStateFlow<String>("")
     val nfcState: StateFlow<String> = _nfcState
 
-    fun setNfcState(newNfcState: String) {
-        _nfcState.value = newNfcState
+    fun setNfcState(newNFCState: String) {
+        _nfcState.value = newNFCState
     } // End of setNfcState
 } // End of NfcViewModel class

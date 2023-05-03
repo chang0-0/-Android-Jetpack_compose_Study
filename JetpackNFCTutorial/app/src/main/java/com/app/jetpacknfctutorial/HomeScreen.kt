@@ -50,9 +50,6 @@ fun HomeScreen(
         }
     }
 
-    val state by remember {
-        mutableStateOf(nfcViewModel.nfcData)
-    }
 } // End of HomeScreen
 
 
